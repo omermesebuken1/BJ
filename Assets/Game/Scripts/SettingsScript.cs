@@ -378,7 +378,6 @@ public class SettingsScript : MonoBehaviour
 
     public void Give1000()
     {
-        gm.CodeRedeemed(1000);
         getMoney.SetActive(false);
         mainPage.SetActive(true);
         CloseSettings();
@@ -460,18 +459,8 @@ public class SettingsScript : MonoBehaviour
         }
 
     }
-    public void FPS30()
-    {
-        gm.Vibrate("soft");
-        gm.SetFPS(30);
-        CheckFPSAndSoundAndVib();
-    }
-    public void FPS60()
-    {
-        gm.Vibrate("soft");
-        gm.SetFPS(60);
-        CheckFPSAndSoundAndVib();
-    }
+
+
     public void ChangeSound()
     {
         gm.Vibrate("soft");
@@ -587,33 +576,6 @@ public class SettingsScript : MonoBehaviour
             statisticsPage.SetActive(false);
         }
     }
-    public void CloseGamblerBadge()
-    {
-        gm.Vibrate("soft");
-        gamblerBadgePage.SetActive(false);
-        statisticsPage.SetActive(true);
-
-    }
-    public void AcceptGamblerBadge()
-    {
-        gm.Vibrate("soft");
-        gm.GamblerBadgeBankAdjust(2500);
-        gm.UpdateStatistics("GamblerBadge");
-        gamblerBadgePage.SetActive(false);
-        mainPage.SetActive(true);
-        CloseSettings();
-    }
-
-
-
-    public void OpenLeaderboard()
-    {
-        gm.Vibrate("soft");
-        //KTGameCenter.SharedCenter().ShowLeaderboard("casino_tower_leaderboards");
-    }
-
-
-
 
     public void Open_PokerRatings()
     {
