@@ -49,8 +49,8 @@ public class BlackJack : MonoBehaviour
     private Card card;
 
     public int playerScore;
-    private int splitScore1;
-    private int splitScore2;
+    public int splitScore1;
+    public int splitScore2;
     private int dealerScore;
 
     [SerializeField] private float gapSizeForPlayer = 240;
@@ -84,12 +84,14 @@ public class BlackJack : MonoBehaviour
 
     [SerializeField] private HelperImp hp;
 
-    private int phase;
+    public int phase;
 
     private bool dealerHitAnimationEnd;
 
     private void Start()
     {
+        Application.targetFrameRate = 60;
+
         ResetWinRate();
 
         ResetBlackJack();
@@ -192,6 +194,8 @@ public class BlackJack : MonoBehaviour
         standButton.interactable = false;
         splitButton.interactable = false;
         DDButton.interactable = false;
+        hp.ResetColors();
+
 
         switch (phase)
         {
@@ -768,13 +772,14 @@ public class BlackJack : MonoBehaviour
 
     private void standSplit1()
     {
+        hp.ResetColors();
         hitButton.interactable = true;
         standButton.interactable = true;
         splitButton.interactable = false;
         DDButton.interactable = true;
         phase = 2;
         PhaseColors();
-
+        hp.helperDone = false;
     }
 
     private void standSplit2()
@@ -789,7 +794,9 @@ public class BlackJack : MonoBehaviour
             standButton.interactable = false;
             splitButton.interactable = false;
             DDButton.interactable = false;
+            hp.ResetColors();
         }
+        
 
     }
 
@@ -1144,7 +1151,7 @@ public class BlackJack : MonoBehaviour
 
         hp.isSplitted = true;
         hp.ResetColors();
-        hp.helperDone = false;
+        hp.helperDone = true;
 
         hitButton.interactable = false;
         standButton.interactable = false;
@@ -1335,6 +1342,7 @@ public class BlackJack : MonoBehaviour
                 {
                     standSplit1();
                 }
+                
 
             });
 
@@ -1347,6 +1355,7 @@ public class BlackJack : MonoBehaviour
         hitButton.interactable = true;
         standButton.interactable = true;
         DDButton.interactable = true;
+        hp.helperDone = false;
     }
 
     private void PhaseColors()

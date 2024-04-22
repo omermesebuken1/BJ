@@ -74,22 +74,6 @@ public class GameManager : MonoBehaviour
 
     }
 
-    public void CoinSound()
-    {
-
-        if (PlayerPrefs.HasKey("Sound"))
-        {
-            if (PlayerPrefs.GetInt("Sound") == 1)
-            {
-
-                GetComponent<AudioSource>().PlayOneShot(coinSound);
-
-            }
-        }
-
-
-    }
-
     public void WinSound()
     {
 

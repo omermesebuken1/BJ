@@ -12,10 +12,4 @@ public class ButtonShape : MonoBehaviour
         GetComponent<Image>().alphaHitTestMinimumThreshold = 0.1f;
     }
 
-    public void deneme()
-    {
-        Debug.Log("aga");
-
-    }
-
 }
