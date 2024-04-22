@@ -39,16 +39,16 @@ public class BlackJack : MonoBehaviour
     [SerializeField] private GameObject cardPrefab;
 
 
-    private List<Card> dealerCards = new List<Card>();
-    private List<Card> playerCards = new List<Card>();
-    private List<Card> splitCards1 = new List<Card>();
-    private List<Card> splitCards2 = new List<Card>();
+    public List<Card> dealerCards = new List<Card>();
+    public List<Card> playerCards = new List<Card>();
+    public List<Card> splitCards1 = new List<Card>();
+    public List<Card> splitCards2 = new List<Card>();
 
 
     private Deck deck;
     private Card card;
 
-    private int playerScore;
+    public int playerScore;
     private int splitScore1;
     private int splitScore2;
     private int dealerScore;
@@ -82,6 +82,8 @@ public class BlackJack : MonoBehaviour
     [SerializeField] private List<GameObject> splitCardsGO1 = new List<GameObject>();
     [SerializeField] private List<GameObject> splitCardsGO2 = new List<GameObject>();
 
+    [SerializeField] private HelperImp hp;
+
     private int phase;
 
     private bool dealerHitAnimationEnd;
@@ -105,6 +107,13 @@ public class BlackJack : MonoBehaviour
     public void ResetBlackJack()
     {
         phase = 0;
+
+        hp.ResetColors();
+        hp.isHit = false;
+        hp.isHit1 = false;
+        hp.isHit2 = false;
+        hp.isSplitted = false;
+        hp.helperDone = true;
 
         PlayerCardArea.SetActive(true);
         SplitCardArea.SetActive(false);
@@ -134,6 +143,8 @@ public class BlackJack : MonoBehaviour
         dealerHitAnimationEnd = true;
 
         prepareCards();
+
+        
 
     }
 
@@ -389,7 +400,7 @@ public class BlackJack : MonoBehaviour
             standButton.interactable = true;
             DDButton.interactable = true;
 
-            if (playerCards[0].number == playerCards[1].number)
+            //if (playerCards[0].number == playerCards[1].number)
             {
                 splitButton.interactable = true;
             }
@@ -398,6 +409,12 @@ public class BlackJack : MonoBehaviour
             {
                 Stand();
             }
+            else
+            {
+                hp.helperDone = false;
+            }
+
+            
 
         });
     }
@@ -425,6 +442,10 @@ public class BlackJack : MonoBehaviour
         standButton.interactable = false;
         splitButton.interactable = false;
         DDButton.interactable = false;
+
+        hp.ResetColors();
+        hp.isHit = true;
+        
 
         gm.Vibrate("soft");
         gm.CardSound();
@@ -456,6 +477,8 @@ public class BlackJack : MonoBehaviour
 
             hitButton.interactable = true;
             standButton.interactable = true;
+
+            hp.helperDone = false;
             if (playerScore == 21)
             {
                 Stand();
@@ -700,6 +723,7 @@ public class BlackJack : MonoBehaviour
 
         }
 
+    
         return toplam;
 
     }
@@ -1100,14 +1124,14 @@ public class BlackJack : MonoBehaviour
 
         if (winRate % 1 == 0)
         {
-            winRateText.text = $"Win Rate: {winRate:F0}%";
+            winRateText.text = $"{winRate:F0}%";
         }
         else
         {
-            winRateText.text = $"Win Rate: {winRate:F1}%";
+            winRateText.text = $"{winRate:F1}%";
         }
 
-        totalHandText.text = $"Hands: {totalHand}";
+        totalHandText.text = $"{totalHand}";
 
     }
 
@@ -1117,6 +1141,10 @@ public class BlackJack : MonoBehaviour
         //status
         totalHand++;
         winRateCounter();
+
+        hp.isSplitted = true;
+        hp.ResetColors();
+        hp.helperDone = false;
 
         hitButton.interactable = false;
         standButton.interactable = false;
@@ -1164,6 +1192,11 @@ public class BlackJack : MonoBehaviour
 
     private void HitSplit1()
     {
+
+        hp.isHit1 = true;
+        hp.ResetColors();
+        hp.helperDone = false;
+
         hitButton.interactable = false;
         standButton.interactable = false;
         splitButton.interactable = false;
@@ -1200,6 +1233,7 @@ public class BlackJack : MonoBehaviour
 
             hitButton.interactable = true;
             standButton.interactable = true;
+            hp.helperDone = false;
             if (splitScore1 == 21)
             {
                 standSplit1();
@@ -1211,6 +1245,10 @@ public class BlackJack : MonoBehaviour
 
     private void HitSplit2()
     {
+        hp.isHit2 = true;
+        hp.ResetColors();
+        hp.helperDone = false;
+
         hitButton.interactable = false;
         standButton.interactable = false;
         splitButton.interactable = false;
@@ -1247,6 +1285,7 @@ public class BlackJack : MonoBehaviour
 
             hitButton.interactable = true;
             standButton.interactable = true;
+            hp.helperDone = false;
 
         });;
 

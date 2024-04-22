@@ -1,0 +1,25 @@
+fileFormatVersion: 2
+guid: 386b655022afa4af8b31b28f0bcca6b4
+TrueTypeFontImporter:
+  externalObjects: {}
+  serializedVersion: 4
+  fontSize: 16
+  forceTextureCase: -2
+  characterSpacing: 0
+  characterPadding: 1
+  includeFontData: 1
+  fontNames:
+  - BC Alphapipe
+  fallbackFontReferences:
+  - {fileID: 12800000, guid: a22ee0271db894bc587b8ee9ee5eb40b, type: 3}
+  - {fileID: 12800000, guid: 75225737f8eb74c63962dbe0301f9fb2, type: 3}
+  - {fileID: 12800000, guid: 75509b503ec3e4dd8a16d45f11c63abf, type: 3}
+  - {fileID: 12800000, guid: 578be4f61e21345ac89603a4c1961a16, type: 3}
+  customCharacters: 
+  fontRenderingMode: 0
+  ascentCalculationMode: 1
+  useLegacyBoundsCalculation: 0
+  shouldRoundAdvanceValue: 1
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
