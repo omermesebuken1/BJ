@@ -24,10 +24,18 @@ public class BlackJack : MonoBehaviour
 
     [SerializeField] private TextMeshProUGUI winRateText;
     [SerializeField] private TextMeshProUGUI totalHandText;
+    [SerializeField] private TextMeshProUGUI givenText;
+    [SerializeField] private TextMeshProUGUI receivedText;
+    [SerializeField] private TextMeshProUGUI diffText;
 
     private float winRate;
     private int totalHand;
-    private int winningHand;
+    private int winCounter;
+    private int loseCounter;
+    private int drawCounter;
+    private int givenCounter;
+    private int receivedCounter;
+    private int diffCounter;
 
     [SerializeField] private Button hitButton;
     [SerializeField] private Button standButton;
@@ -88,26 +96,40 @@ public class BlackJack : MonoBehaviour
 
     private bool dealerHitAnimationEnd;
 
+    private bool doubleDowned0;
+    private bool doubleDowned1;
+    private bool doubleDowned2;
+
     private void Start()
     {
         Application.targetFrameRate = 60;
 
-        ResetWinRate();
-
-        ResetBlackJack();
+        ResetAll();
     }
 
-    private void ResetWinRate()
+    public void ResetWinRate()
     {
-        winningHand = 0;
+        winCounter = 0;
+        loseCounter = 0;
+        drawCounter = 0;
+        givenCounter = 0;
+        receivedCounter = 0;
+        diffCounter = 0;
         winRate = 0;
         totalHand = 0;
-        totalHandText.text = "Hands: 0";
-        winRateText.text = "Win Rate: 0%";
+        
+    }
+
+    public void ResetAll()
+    {
+        ResetWinRate();
+        ResetBlackJack();
     }
 
     public void ResetBlackJack()
     {
+        winRateCounter();
+
         phase = 0;
 
         hp.ResetColors();
@@ -117,13 +139,16 @@ public class BlackJack : MonoBehaviour
         hp.isSplitted = false;
         hp.helperDone = true;
 
+        doubleDowned0 = false;
+        doubleDowned1 = false;
+        doubleDowned2 = false;
+
         PlayerCardArea.SetActive(true);
         SplitCardArea.SetActive(false);
 
         winRateCalculation = false;
 
-        totalHand++;
-        winRateCounter();
+
 
         FadeInButtons();
 
@@ -145,8 +170,6 @@ public class BlackJack : MonoBehaviour
         dealerHitAnimationEnd = true;
 
         prepareCards();
-
-        
 
     }
 
@@ -188,26 +211,29 @@ public class BlackJack : MonoBehaviour
 
     public void DD()
     {
-        gm.Vibrate("soft");
-        gm.CardSound();
         hitButton.interactable = false;
         standButton.interactable = false;
         splitButton.interactable = false;
         DDButton.interactable = false;
         hp.ResetColors();
 
+        givenCounter++;
+        winRateCounter();
 
         switch (phase)
         {
             case 0:
+                doubleDowned0 = true;
                 DD_0();
                 break;
 
             case 1:
+                doubleDowned1 = true;
                 DD_1();
                 break;
 
             case 2:
+                doubleDowned2 = true;
                 DD_2();
                 break;
         }
@@ -288,7 +314,7 @@ public class BlackJack : MonoBehaviour
             splitScore1 = Calculator(splitCards1);
             splitScoreText1.text = splitScore1.ToString();
             Stand();
-            
+
         });
 
     }
@@ -302,8 +328,6 @@ public class BlackJack : MonoBehaviour
         splitButton.interactable = false;
         DDButton.interactable = false;
 
-        gm.Vibrate("soft");
-        gm.CardSound();
 
         if (gapSizeForSplit2 > 80)
         {
@@ -403,8 +427,9 @@ public class BlackJack : MonoBehaviour
             hitButton.interactable = true;
             standButton.interactable = true;
             DDButton.interactable = true;
+            givenCounter++;
 
-            //if (playerCards[0].number == playerCards[1].number)
+            if (playerCards[0].number == playerCards[1].number)
             {
                 splitButton.interactable = true;
             }
@@ -415,10 +440,10 @@ public class BlackJack : MonoBehaviour
             }
             else
             {
-                hp.helperDone = false;
+                hp.getHelp();
             }
 
-            
+
 
         });
     }
@@ -449,10 +474,8 @@ public class BlackJack : MonoBehaviour
 
         hp.ResetColors();
         hp.isHit = true;
-        
 
-        gm.Vibrate("soft");
-        gm.CardSound();
+
         if (gapSizeForPlayer > 80)
         {
             gapSizeForPlayer -= 40;
@@ -482,56 +505,59 @@ public class BlackJack : MonoBehaviour
             hitButton.interactable = true;
             standButton.interactable = true;
 
-            hp.helperDone = false;
             if (playerScore == 21)
             {
                 Stand();
             }
+            else
+            {
+                hp.getHelp();
+            }
         });
 
-        
+
 
 
     }
 
     private void HitDealer()
     {
-        
-        if(dealerHitAnimationEnd)
+
+        if (dealerHitAnimationEnd)
         {
 
-        dealerHitAnimationEnd = false;
+            dealerHitAnimationEnd = false;
 
-        if (gapSizeForDealer > 80)
-        {
-            gapSizeForDealer -= 40;
-        }
+            if (gapSizeForDealer > 80)
+            {
+                gapSizeForDealer -= 40;
+            }
 
-        card = deck.DrawCard();
-        dealerCards.Add(card);
+            card = deck.DrawCard();
+            dealerCards.Add(card);
 
-        var newCard = Instantiate(cardPrefab);
-        dealerCardsGO.Add(newCard);
+            var newCard = Instantiate(cardPrefab);
+            dealerCardsGO.Add(newCard);
 
-        newCard.GetComponent<CardScript>().GetCardBack();
+            newCard.GetComponent<CardScript>().GetCardBack();
 
-        newCard.transform.parent = dealerCardsGO[0].transform.parent;
-        newCard.transform.position = dealerCardsGO[0].transform.position;
-        newCard.transform.localScale = dealerCardsGO[0].transform.localScale;
-        newCard.GetComponent<SpriteRenderer>().sortingOrder = dealerCardsGO[dealerCardsGO.Count - 2].GetComponent<SpriteRenderer>().sortingOrder + 1;
-        ArrangeObjects(dealerCardsGO, gapSizeForDealer);
-        Vector3 targetPos = dealerCardsGO[dealerCardsGO.Count - 1].transform.localPosition;
-        newCard.transform.localPosition = new Vector3(1000, 0, 0);
-        newCard.transform.DOLocalMove(targetPos, 0.3f).SetEase(Ease.OutBack).OnComplete(() =>
-        {
-            StartCoroutine(FlipCard(newCard, 0.1f, card));
-            dealerScore = Calculator(dealerCards);
-            dealerScoreText.text = dealerScore.ToString();
-            dealerHitAnimationEnd = true;
-            
-        });
+            newCard.transform.parent = dealerCardsGO[0].transform.parent;
+            newCard.transform.position = dealerCardsGO[0].transform.position;
+            newCard.transform.localScale = dealerCardsGO[0].transform.localScale;
+            newCard.GetComponent<SpriteRenderer>().sortingOrder = dealerCardsGO[dealerCardsGO.Count - 2].GetComponent<SpriteRenderer>().sortingOrder + 1;
+            ArrangeObjects(dealerCardsGO, gapSizeForDealer);
+            Vector3 targetPos = dealerCardsGO[dealerCardsGO.Count - 1].transform.localPosition;
+            newCard.transform.localPosition = new Vector3(1000, 0, 0);
+            newCard.transform.DOLocalMove(targetPos, 0.3f).SetEase(Ease.OutBack).OnComplete(() =>
+            {
+                StartCoroutine(FlipCard(newCard, 0.1f, card));
+                dealerScore = Calculator(dealerCards);
+                dealerScoreText.text = dealerScore.ToString();
+                dealerHitAnimationEnd = true;
 
-        
+            });
+
+
 
         }
 
@@ -727,14 +753,13 @@ public class BlackJack : MonoBehaviour
 
         }
 
-    
+
         return toplam;
 
     }
 
     public void Stand()
     {
-        gm.Vibrate("soft");
 
         switch (phase)
         {
@@ -779,7 +804,7 @@ public class BlackJack : MonoBehaviour
         DDButton.interactable = true;
         phase = 2;
         PhaseColors();
-        hp.helperDone = false;
+        hp.getHelp();
     }
 
     private void standSplit2()
@@ -796,7 +821,7 @@ public class BlackJack : MonoBehaviour
             DDButton.interactable = false;
             hp.ResetColors();
         }
-        
+
 
     }
 
@@ -850,31 +875,35 @@ public class BlackJack : MonoBehaviour
             if (playerBusted)
             {
                 playerScoreText.color = new Color32(255, 119, 94, 255); //red
+                loseCounter++;
             }
             else if (!playerBusted && dealerBusted)
             {
                 playerScoreText.color = new Color32(93, 255, 151, 255); //green
-                winningHand++;
+                winCounter++;
+                receivedCounter += doubleDowned0 ? 4 : 2;
             }
             else if (!playerBusted && !dealerBusted)
             {
                 if (playerScore > dealerScore)
                 {
                     playerScoreText.color = new Color32(93, 255, 151, 255); //green
-                    winningHand++;
+                    winCounter++;
+                    receivedCounter += doubleDowned0 ? 4 : 2;
                 }
                 else if (dealerScore > playerScore)
                 {
                     playerScoreText.color = new Color32(255, 119, 94, 255); //red
+                    loseCounter++;
                 }
                 else if (dealerScore == playerScore)
                 {
-                    totalHand--;
+                    drawCounter++;
+                    receivedCounter += doubleDowned0 ? 2 : 1;
                 }
             }
 
             winRateCalculation = true;
-            winRateCounter();
             FadeOutButtons();
         }
 
@@ -894,7 +923,7 @@ public class BlackJack : MonoBehaviour
 
     private void GameStatus2()
     {
-        if(splitScore1 > 21)
+        if (splitScore1 > 21)
         {
             split1Busted = true;
             splitScoreText1.color = new Color32(255, 119, 94, 255); //red
@@ -942,7 +971,7 @@ public class BlackJack : MonoBehaviour
                 StartCoroutine(DealerHit(0.4f));
                 dealerHitting = false;
             }
-            
+
         }
 
         if (gameEnd && !winRateCalculation)
@@ -958,27 +987,32 @@ public class BlackJack : MonoBehaviour
             if (split2Busted)
             {
                 splitScoreText2.color = new Color32(255, 119, 94, 255); //red
+                loseCounter++;
             }
             else if (!split2Busted && dealerBusted)
             {
                 splitScoreText2.color = new Color32(93, 255, 151, 255); //green
-                winningHand++;
+                winCounter++;
+                receivedCounter += doubleDowned2 ? 4 : 2;
             }
             else if (!split2Busted && !dealerBusted)
             {
                 if (splitScore2 > dealerScore)
                 {
                     splitScoreText2.color = new Color32(93, 255, 151, 255); //green
-                    winningHand++;
+                    winCounter++;
+                    receivedCounter += doubleDowned2 ? 4 : 2;
                 }
                 else if (dealerScore > splitScore2)
                 {
                     splitScoreText2.color = new Color32(255, 119, 94, 255); //red
+                    loseCounter++;
                 }
                 else if (dealerScore == splitScore2)
                 {
                     splitScoreText2.color = new Color32(255, 255, 255, 255); //white
-                    totalHand--;
+                    drawCounter++;
+                    receivedCounter += doubleDowned2 ? 2 : 1;
                 }
             }
 
@@ -986,34 +1020,38 @@ public class BlackJack : MonoBehaviour
             if (split1Busted)
             {
                 splitScoreText1.color = new Color32(255, 119, 94, 255); //red
+                loseCounter++;
             }
             else if (!split1Busted && dealerBusted)
             {
                 splitScoreText1.color = new Color32(93, 255, 151, 255); //green
-                winningHand++;
+                winCounter++;
+                receivedCounter += doubleDowned1 ? 4 : 2;
             }
             else if (!split1Busted && !dealerBusted)
             {
                 if (splitScore1 > dealerScore)
                 {
                     splitScoreText1.color = new Color32(93, 255, 151, 255); //green
-                    winningHand++;
+                    winCounter++;
+                    receivedCounter += doubleDowned1 ? 4 : 2;
                 }
                 else if (dealerScore > splitScore1)
                 {
                     splitScoreText1.color = new Color32(255, 119, 94, 255); //red
+                    loseCounter++;
                 }
                 else if (dealerScore == splitScore1)
                 {
                     splitScoreText1.color = new Color32(255, 255, 255, 255); //white
-                    totalHand--;
+                    drawCounter++;
+                    receivedCounter += doubleDowned1 ? 2 : 1;
                 }
             }
 
 
 
             winRateCalculation = true;
-            winRateCounter();
             FadeOutButtons();
         }
 
@@ -1050,7 +1088,6 @@ public class BlackJack : MonoBehaviour
         });
 
     }
-
 
     public void FadeOutButtons()
     {
@@ -1096,37 +1133,44 @@ public class BlackJack : MonoBehaviour
 
     private IEnumerator DealerHit(float waitTime)
     {
-        
-            gm.CardSound();
-            WaitForSeconds wait = new WaitForSeconds(waitTime);
 
-            dealerCardsGO[1].GetComponent<CardScript>().GetCardSprite(dealerCards[1]);
-            yield return wait;
+        WaitForSeconds wait = new WaitForSeconds(waitTime);
 
-            if (dealerScore < 17 && !gameEnd && dealerHitAnimationEnd)
+        dealerCardsGO[1].GetComponent<CardScript>().GetCardSprite(dealerCards[1]);
+        yield return wait;
+
+        if (dealerScore < 17 && !gameEnd && dealerHitAnimationEnd)
+        {
+            do
             {
-                do
-                {
-                    HitDealer();
-                    yield return wait;
-                }
-                while (dealerScore < 17);
-
+                HitDealer();
+                yield return wait;
             }
+            while (dealerScore < 17);
 
-            if (dealerScore >= 17)
-            {
-                gameEnd = true;
-            }
-        
+        }
+
+        if (dealerScore >= 17)
+        {
+            gameEnd = true;
+        }
+
 
     }
 
     private void winRateCounter()
     {
-        if (totalHand > 0)
+        //total hand
+
+        totalHand = winCounter + loseCounter + drawCounter;
+        totalHandText.text = $"{totalHand}";
+
+
+        //winrate
+
+        if (winCounter + loseCounter > 0)
         {
-            winRate = ((float)winningHand / totalHand) * 100;
+            winRate = ((float)winCounter / (winCounter + loseCounter)) * 100;
         }
 
         if (winRate % 1 == 0)
@@ -1138,7 +1182,29 @@ public class BlackJack : MonoBehaviour
             winRateText.text = $"{winRate:F1}%";
         }
 
-        totalHandText.text = $"{totalHand}";
+
+        //diff
+        diffCounter = receivedCounter - givenCounter;
+
+        receivedText.text = $"{receivedCounter}";
+        givenText.text = $"{givenCounter}";
+        diffText.text = $"{diffCounter}";
+
+        if (diffCounter == 0)
+        {
+            diffText.color = new Color32(255, 255, 255, 255); //white
+        }
+        else if (diffCounter > 0)
+        {
+            diffText.color = new Color32(93, 255, 151, 255); //green
+        }
+        else if (diffCounter < 0)
+        {
+            diffText.color = new Color32(255, 119, 94, 255); //red
+        }
+
+
+
 
     }
 
@@ -1146,7 +1212,7 @@ public class BlackJack : MonoBehaviour
     public void Split()
     {
         //status
-        totalHand++;
+        givenCounter++;
         winRateCounter();
 
         hp.isSplitted = true;
@@ -1202,15 +1268,12 @@ public class BlackJack : MonoBehaviour
 
         hp.isHit1 = true;
         hp.ResetColors();
-        hp.helperDone = false;
 
         hitButton.interactable = false;
         standButton.interactable = false;
         splitButton.interactable = false;
         DDButton.interactable = false;
 
-        gm.Vibrate("soft");
-        gm.CardSound();
 
         if (gapSizeForSplit1 > 80)
         {
@@ -1240,29 +1303,29 @@ public class BlackJack : MonoBehaviour
 
             hitButton.interactable = true;
             standButton.interactable = true;
-            hp.helperDone = false;
             if (splitScore1 == 21)
             {
                 standSplit1();
             }
+            else
+            {
+                hp.getHelp();
+            }
         });
 
-        
+
     }
 
     private void HitSplit2()
     {
         hp.isHit2 = true;
         hp.ResetColors();
-        hp.helperDone = false;
 
         hitButton.interactable = false;
         standButton.interactable = false;
         splitButton.interactable = false;
         DDButton.interactable = false;
 
-        gm.Vibrate("soft");
-        gm.CardSound();
 
         if (gapSizeForSplit2 > 80)
         {
@@ -1292,16 +1355,15 @@ public class BlackJack : MonoBehaviour
 
             hitButton.interactable = true;
             standButton.interactable = true;
-            hp.helperDone = false;
+            hp.getHelp();
 
-        });;
+        }); ;
 
-        
+
     }
 
     private void GiveCardsToSplittedCards()
     {
-        gm.CardSound();
 
         if (gapSizeForPlayer > 80)
         {
@@ -1327,7 +1389,6 @@ public class BlackJack : MonoBehaviour
             splitCardsGO2[1].GetComponent<CardScript>().GetCardBack();
             Vector3 tmpTargetPos4 = splitCardsGO2[1].transform.localPosition;
             splitCardsGO2[1].SetActive(true);
-            gm.CardSound();
             splitCardsGO2[1].transform.DOLocalMove(tmpTargetPos4, 0.2f).OnComplete(() =>
             {
                 StartCoroutine(FlipCard(splitCardsGO2[1], 0.1f, card));
@@ -1342,7 +1403,11 @@ public class BlackJack : MonoBehaviour
                 {
                     standSplit1();
                 }
-                
+                else
+                {
+                    hp.getHelp();
+                }
+
 
             });
 
@@ -1355,7 +1420,6 @@ public class BlackJack : MonoBehaviour
         hitButton.interactable = true;
         standButton.interactable = true;
         DDButton.interactable = true;
-        hp.helperDone = false;
     }
 
     private void PhaseColors()

@@ -14,47 +14,38 @@ public class GameManager : MonoBehaviour
 {
     private FeedbackGenerator _selectGenerator;
     private FeedbackGenerator _impactGenerator;
-    [HideInInspector] public double totalMoney;
-    [HideInInspector] public int fps;
     [SerializeField] private AudioClip cardFlipSound;
     [SerializeField] private AudioClip coinSound;
     [SerializeField] private AudioClip winSound;
     [SerializeField] private AudioClip loseSound;
     [SerializeField] private AudioClip modeWin;
 
-    [SerializeField] private GameObject genelUI;
-    [SerializeField] private GameObject BJCanvas;
 
     public void Vibrate(string type)
     {
         if (Vibration.isSupported)
         {
-            if (PlayerPrefs.HasKey("Vibration"))
+            switch (type)
             {
-                if (PlayerPrefs.GetInt("Vibration") == 1)
-                {
-                    switch (type)
+                case "soft":
+                    if (_selectGenerator == null)
                     {
-                        case "soft":
-                            if (_selectGenerator == null)
-                            {
-                                _selectGenerator = Vibration.Instance.CreateFeedbackGenerator(FeedbackGeneratorType.SELECTION);
-                            }
-                            _selectGenerator.PerformFeedback();
-                            break;
-
-                        case "hard":
-                            if (_impactGenerator == null)
-                            {
-                                _impactGenerator = Vibration.Instance.CreateFeedbackGenerator(FeedbackGeneratorType.IMPACT);
-                                _impactGenerator.Prepare();
-                            }
-                            _impactGenerator.PerformFeedback();
-                            break;
+                        _selectGenerator = Vibration.Instance.CreateFeedbackGenerator(FeedbackGeneratorType.SELECTION);
                     }
-                }
+                    _selectGenerator.PerformFeedback();
+                    break;
+
+                case "hard":
+                    if (_impactGenerator == null)
+                    {
+                        _impactGenerator = Vibration.Instance.CreateFeedbackGenerator(FeedbackGeneratorType.IMPACT);
+                        _impactGenerator.Prepare();
+                    }
+                    _impactGenerator.PerformFeedback();
+                    break;
             }
         }
+
 
     }
 
@@ -121,14 +112,6 @@ public class GameManager : MonoBehaviour
 
 
     }
-
-    public void openBJ()
-    {
-        BJCanvas.SetActive(true);
-        genelUI.SetActive(false);
-
-    }
-
 
 
 }

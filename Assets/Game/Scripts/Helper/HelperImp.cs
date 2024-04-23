@@ -29,17 +29,24 @@ public class HelperImp : MonoBehaviour
     private Color32 greenColor = new Color32(112, 214, 201, 255);
     private Color32 originalColor = new Color32(161, 165, 224, 255);
 
+    private Color32 helperOriginalColor = new Color32(76, 80, 128, 255);
+    private Color32 helperOnColor = new Color32(79, 118, 128, 255);
+
     public void changeHelperStatus()
     {
         if (helperStatus)
         {
             helperStatus = false;
+            PlayerPrefs.SetInt("Helper", 0);
+            helperButton.image.color = helperOriginalColor;
             ResetColors();
         }
         else
         {
             helperStatus = true;
-
+            PlayerPrefs.SetInt("Helper", 1);
+            helperButton.image.color = helperOnColor;
+            getHelp();
         }
     }
 
@@ -49,39 +56,21 @@ public class HelperImp : MonoBehaviour
         {
             if (PlayerPrefs.GetInt("Helper") == 1)
             {
-
                 helperStatus = true;
-                helperButton.GetComponentInChildren<TextMeshProUGUI>().text = "HELPER: ON";
-
+                helperButton.image.color = helperOnColor;
             }
             else
             {
                 helperStatus = false;
-                helperButton.GetComponentInChildren<TextMeshProUGUI>().text = "HELPER: OFF";
+                helperButton.image.color = helperOriginalColor;
             }
         }
         else
         {
             PlayerPrefs.SetInt("Helper", 1);
             helperStatus = true;
-            helperButton.GetComponentInChildren<TextMeshProUGUI>().text = "HELPER: ON";
+            helperButton.image.color = helperOnColor;
 
-        }
-    }
-    private void Update()
-    {
-
-        if (helperStatus)
-        {
-            PlayerPrefs.SetInt("Helper", 1);
-            helperButton.GetComponentInChildren<TextMeshProUGUI>().text = "HELPER: ON";
-            helperDone = false;
-            Colorize(HelperHelps());
-        }
-        else
-        {
-            PlayerPrefs.SetInt("Helper", 0);
-            helperButton.GetComponentInChildren<TextMeshProUGUI>().text = "HELPER: OFF";
         }
     }
 
@@ -96,7 +85,7 @@ public class HelperImp : MonoBehaviour
 
             if (dealerNum > 10) dealerNum = 10;
 
-            //Debug.Log("Dealer Num: " + dealerNum);
+
 
             if (isSplitted)
             {
@@ -570,8 +559,21 @@ public class HelperImp : MonoBehaviour
     }
 
 
+    public void getHelp()
+    {
+        helperDone = false;
+
+        if (helperStatus && !helperDone)
+        {
+            Colorize(HelperHelps());
+            helperDone = true;
+        }
+    }
+    
     private void Colorize(choice ch)
     {
+        ResetColors();
+
         switch (ch)
         {
             case choice.S:
@@ -587,19 +589,14 @@ public class HelperImp : MonoBehaviour
                 DDButton.image.color = greenColor;
                 break;
         }
-
-        helperDone = true;
-
     }
 
     public void ResetColors()
     {
-        Debug.Log("Reset");
         standButton.image.color = originalColor;
         splitButton.image.color = originalColor;
         hitButton.image.color = originalColor;
         DDButton.image.color = originalColor;
-
     }
 
 
