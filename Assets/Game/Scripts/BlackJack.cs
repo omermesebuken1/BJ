@@ -110,12 +110,15 @@ public class BlackJack : MonoBehaviour
 
     private int highScoreState;
 
+    private Color32 pinkColor = new Color32(255, 148, 224, 255);
+    private Color32 yellowColor = new Color32(234, 187, 70, 255);
+    private Color32 cyanColor = new Color32(108, 209, 255, 255);
+
     private void Start()
     {
         Application.targetFrameRate = 60;
         HighScoreStarter();
         ResetAll();
-        ButtonTest();
     }
 
     public void ResetWinRate()
@@ -1287,14 +1290,13 @@ public class BlackJack : MonoBehaviour
             if (winRate > PlayerPrefs.GetFloat("winRate25"))
                 PlayerPrefs.SetFloat("winRate25", winRate);
 
-            if (givenCounter > PlayerPrefs.GetInt("given25"))
-                PlayerPrefs.SetInt("given25", givenCounter);
-
-            if (receivedCounter > PlayerPrefs.GetInt("received25"))
-                PlayerPrefs.SetInt("received25", receivedCounter);
-
             if (diffCounter > PlayerPrefs.GetFloat("diff25"))
+            {
+                PlayerPrefs.SetInt("given25", givenCounter);
                 PlayerPrefs.SetFloat("diff25", diffCounter);
+                PlayerPrefs.SetInt("received25", receivedCounter);
+            }
+
         }
 
         if (totalHand == 50)
@@ -1305,14 +1307,13 @@ public class BlackJack : MonoBehaviour
             if (winRate > PlayerPrefs.GetFloat("winRate50"))
                 PlayerPrefs.SetFloat("winRate50", winRate);
 
-            if (givenCounter > PlayerPrefs.GetInt("given50"))
-                PlayerPrefs.SetInt("given50", givenCounter);
-
-            if (receivedCounter > PlayerPrefs.GetInt("received50"))
-                PlayerPrefs.SetInt("received50", receivedCounter);
-
             if (diffCounter > PlayerPrefs.GetFloat("diff50"))
+            {
+                PlayerPrefs.SetInt("given50", givenCounter);
                 PlayerPrefs.SetFloat("diff50", diffCounter);
+                PlayerPrefs.SetInt("received50", receivedCounter);
+            }
+
         }
 
         if (totalHand == 100)
@@ -1323,14 +1324,13 @@ public class BlackJack : MonoBehaviour
             if (winRate > PlayerPrefs.GetFloat("winRate100"))
                 PlayerPrefs.SetFloat("winRate100", winRate);
 
-            if (givenCounter > PlayerPrefs.GetInt("given100"))
-                PlayerPrefs.SetInt("given100", givenCounter);
-
-            if (receivedCounter > PlayerPrefs.GetInt("received100"))
-                PlayerPrefs.SetInt("received100", receivedCounter);
-
             if (diffCounter > PlayerPrefs.GetFloat("diff100"))
+            {
+                PlayerPrefs.SetInt("received100", receivedCounter);
                 PlayerPrefs.SetFloat("diff100", diffCounter);
+                PlayerPrefs.SetInt("given100", givenCounter);
+            }
+
         }
 
 
@@ -1358,8 +1358,15 @@ public class BlackJack : MonoBehaviour
         highScoreGivenText.text = $"{PlayerPrefs.GetInt("given25")}";
         highScoreReceivedText.text = $"{PlayerPrefs.GetInt("received25")}";
         highScoreDiffText.text = $"{PlayerPrefs.GetFloat("diff25")}";
-        
-        
+
+        highScoreHeaderText.color = pinkColor;
+        highScoreHandsText.color = pinkColor;
+        highScoreWinRateText.color = pinkColor;
+        highScoreGivenText.color = pinkColor;
+        highScoreReceivedText.color = pinkColor;
+        highScoreDiffText.color = pinkColor;
+
+
     }
 
     public void nextHighScore()
@@ -1385,6 +1392,13 @@ public class BlackJack : MonoBehaviour
             highScoreGivenText.text = $"{PlayerPrefs.GetInt("given50")}";
             highScoreReceivedText.text = $"{PlayerPrefs.GetInt("received50")}";
             highScoreDiffText.text = $"{PlayerPrefs.GetFloat("diff50")}";
+
+            highScoreHeaderText.color = cyanColor;
+            highScoreHandsText.color = cyanColor;
+            highScoreWinRateText.color = cyanColor;
+            highScoreGivenText.color = cyanColor;
+            highScoreReceivedText.color = cyanColor;
+            highScoreDiffText.color = cyanColor;
         }
         else if (highScoreState == 50)
         {
@@ -1393,7 +1407,7 @@ public class BlackJack : MonoBehaviour
             highScoreHeaderText.text = "High Scores - 100 Hands";
 
             highScoreHandsText.text = $"{PlayerPrefs.GetInt("totalHands100")}";
-            
+
             float winRateTmp = PlayerPrefs.GetFloat("winRate100");
             if (winRateTmp % 1 == 0)
             {
@@ -1407,6 +1421,14 @@ public class BlackJack : MonoBehaviour
             highScoreGivenText.text = $"{PlayerPrefs.GetInt("given100")}";
             highScoreReceivedText.text = $"{PlayerPrefs.GetInt("received100")}";
             highScoreDiffText.text = $"{PlayerPrefs.GetFloat("diff100")}";
+
+
+            highScoreHeaderText.color = yellowColor;
+            highScoreHandsText.color = yellowColor;
+            highScoreWinRateText.color = yellowColor;
+            highScoreGivenText.color = yellowColor;
+            highScoreReceivedText.color = yellowColor;
+            highScoreDiffText.color = yellowColor;
 
         }
         else if (highScoreState == 100)
@@ -1674,11 +1696,6 @@ public class BlackJack : MonoBehaviour
             }
         }
 
-    }
-
-    public void ButtonTest()
-    {
-        Debug.Log($"{PlayerPrefs.GetInt("diff25")}");
     }
 
 
