@@ -100,11 +100,22 @@ public class BlackJack : MonoBehaviour
     private bool doubleDowned1;
     private bool doubleDowned2;
 
+    [SerializeField] private GameObject highScoreArea;
+    [SerializeField] private TextMeshProUGUI highScoreHeaderText;
+    [SerializeField] private TextMeshProUGUI highScoreHandsText;
+    [SerializeField] private TextMeshProUGUI highScoreWinRateText;
+    [SerializeField] private TextMeshProUGUI highScoreGivenText;
+    [SerializeField] private TextMeshProUGUI highScoreReceivedText;
+    [SerializeField] private TextMeshProUGUI highScoreDiffText;
+
+    private int highScoreState;
+
     private void Start()
     {
         Application.targetFrameRate = 60;
-
+        HighScoreStarter();
         ResetAll();
+        ButtonTest();
     }
 
     public void ResetWinRate()
@@ -117,17 +128,52 @@ public class BlackJack : MonoBehaviour
         diffCounter = 0;
         winRate = 0;
         totalHand = 0;
-        
+
+    }
+
+    public void ContinueButton()
+    {
+        float fadeTime = 0.2f;
+
+        hitButton.gameObject.SetActive(true);
+        standButton.gameObject.SetActive(true);
+        splitButton.gameObject.SetActive(true);
+        DDButton.gameObject.SetActive(true);
+
+        continueButton.GetComponentInChildren<TextMeshProUGUI>().DOFade(0f, fadeTime);
+        continueButton.image.DOFade(0f, fadeTime).OnComplete(() =>
+        {
+            continueButton.gameObject.SetActive(false);
+
+            ResetBlackJack();
+
+            hitButton.GetComponentInChildren<TextMeshProUGUI>().DOFade(1f, fadeTime);
+            hitButton.image.DOFade(1f, fadeTime);
+
+            standButton.GetComponentInChildren<TextMeshProUGUI>().DOFade(1f, fadeTime);
+            standButton.image.DOFade(1f, fadeTime);
+
+            splitButton.GetComponentInChildren<TextMeshProUGUI>().DOFade(1f, fadeTime);
+            splitButton.image.DOFade(1f, fadeTime);
+
+            DDButton.GetComponentInChildren<TextMeshProUGUI>().DOFade(1f, fadeTime);
+            DDButton.image.DOFade(1f, fadeTime);
+
+        });
     }
 
     public void ResetAll()
     {
+
         ResetWinRate();
         ResetBlackJack();
     }
 
     public void ResetBlackJack()
     {
+        highScoreState = 0;
+        highScoreArea.SetActive(false);
+
         winRateCounter();
 
         phase = 0;
@@ -1130,7 +1176,6 @@ public class BlackJack : MonoBehaviour
 
     }
 
-
     private IEnumerator DealerHit(float waitTime)
     {
 
@@ -1203,11 +1248,174 @@ public class BlackJack : MonoBehaviour
             diffText.color = new Color32(255, 119, 94, 255); //red
         }
 
+        HighScoreChecker();
+
+    }
+
+    private void HighScoreStarter()
+    {
+        if (!PlayerPrefs.HasKey("totalHands25"))
+        {
+            PlayerPrefs.SetInt("totalHands25", 0);
+            PlayerPrefs.SetFloat("winRate25", 0);
+            PlayerPrefs.SetInt("given25", 0);
+            PlayerPrefs.SetInt("received25", 0);
+            PlayerPrefs.SetFloat("diff25", -99);
+
+            PlayerPrefs.SetInt("totalHands50", 0);
+            PlayerPrefs.SetFloat("winRate50", 0);
+            PlayerPrefs.SetInt("given50", 0);
+            PlayerPrefs.SetInt("received50", 0);
+            PlayerPrefs.SetFloat("diff50", -99);
+
+            PlayerPrefs.SetInt("totalHands100", 0);
+            PlayerPrefs.SetFloat("winRate100", 0);
+            PlayerPrefs.SetInt("given100", 0);
+            PlayerPrefs.SetInt("received100", 0);
+            PlayerPrefs.SetFloat("diff100", -99);
+        }
+    }
+
+    private void HighScoreChecker()
+    {
+
+        if (totalHand == 25)
+        {
+            if (totalHand > PlayerPrefs.GetInt("totalHands25"))
+                PlayerPrefs.SetInt("totalHands25", totalHand);
+
+            if (winRate > PlayerPrefs.GetFloat("winRate25"))
+                PlayerPrefs.SetFloat("winRate25", winRate);
+
+            if (givenCounter > PlayerPrefs.GetInt("given25"))
+                PlayerPrefs.SetInt("given25", givenCounter);
+
+            if (receivedCounter > PlayerPrefs.GetInt("received25"))
+                PlayerPrefs.SetInt("received25", receivedCounter);
+
+            if (diffCounter > PlayerPrefs.GetFloat("diff25"))
+                PlayerPrefs.SetFloat("diff25", diffCounter);
+        }
+
+        if (totalHand == 50)
+        {
+            if (totalHand > PlayerPrefs.GetInt("totalHands50"))
+                PlayerPrefs.SetInt("totalHands50", totalHand);
+
+            if (winRate > PlayerPrefs.GetFloat("winRate50"))
+                PlayerPrefs.SetFloat("winRate50", winRate);
+
+            if (givenCounter > PlayerPrefs.GetInt("given50"))
+                PlayerPrefs.SetInt("given50", givenCounter);
+
+            if (receivedCounter > PlayerPrefs.GetInt("received50"))
+                PlayerPrefs.SetInt("received50", receivedCounter);
+
+            if (diffCounter > PlayerPrefs.GetFloat("diff50"))
+                PlayerPrefs.SetFloat("diff50", diffCounter);
+        }
+
+        if (totalHand == 100)
+        {
+            if (totalHand > PlayerPrefs.GetInt("totalHands100"))
+                PlayerPrefs.SetInt("totalHands100", totalHand);
+
+            if (winRate > PlayerPrefs.GetFloat("winRate100"))
+                PlayerPrefs.SetFloat("winRate100", winRate);
+
+            if (givenCounter > PlayerPrefs.GetInt("given100"))
+                PlayerPrefs.SetInt("given100", givenCounter);
+
+            if (receivedCounter > PlayerPrefs.GetInt("received100"))
+                PlayerPrefs.SetInt("received100", receivedCounter);
+
+            if (diffCounter > PlayerPrefs.GetFloat("diff100"))
+                PlayerPrefs.SetFloat("diff100", diffCounter);
+        }
 
 
 
     }
 
+    public void openHighScores()
+    {
+        highScoreState = 25;
+        highScoreArea.SetActive(true);
+        highScoreHeaderText.text = "High Scores - 25 Hands";
+
+        highScoreHandsText.text = $"{PlayerPrefs.GetInt("totalHands25")}";
+
+        float winRateTmp = PlayerPrefs.GetFloat("winRate25");
+        if (winRateTmp % 1 == 0)
+        {
+            highScoreWinRateText.text = $"{winRateTmp:F0}%";
+        }
+        else
+        {
+            highScoreWinRateText.text = $"{winRateTmp:F1}%";
+        }
+
+        highScoreGivenText.text = $"{PlayerPrefs.GetInt("given25")}";
+        highScoreReceivedText.text = $"{PlayerPrefs.GetInt("received25")}";
+        highScoreDiffText.text = $"{PlayerPrefs.GetFloat("diff25")}";
+        
+        
+    }
+
+    public void nextHighScore()
+    {
+        if (highScoreState == 25)
+        {
+            highScoreState = 50;
+            highScoreArea.SetActive(true);
+            highScoreHeaderText.text = "High Scores - 50 Hands";
+
+            highScoreHandsText.text = $"{PlayerPrefs.GetInt("totalHands50")}";
+
+            float winRateTmp = PlayerPrefs.GetFloat("winRate50");
+            if (winRateTmp % 1 == 0)
+            {
+                highScoreWinRateText.text = $"{winRateTmp:F0}%";
+            }
+            else
+            {
+                highScoreWinRateText.text = $"{winRateTmp:F1}%";
+            }
+
+            highScoreGivenText.text = $"{PlayerPrefs.GetInt("given50")}";
+            highScoreReceivedText.text = $"{PlayerPrefs.GetInt("received50")}";
+            highScoreDiffText.text = $"{PlayerPrefs.GetFloat("diff50")}";
+        }
+        else if (highScoreState == 50)
+        {
+            highScoreState = 100;
+            highScoreArea.SetActive(true);
+            highScoreHeaderText.text = "High Scores - 100 Hands";
+
+            highScoreHandsText.text = $"{PlayerPrefs.GetInt("totalHands100")}";
+            
+            float winRateTmp = PlayerPrefs.GetFloat("winRate100");
+            if (winRateTmp % 1 == 0)
+            {
+                highScoreWinRateText.text = $"{winRateTmp:F0}%";
+            }
+            else
+            {
+                highScoreWinRateText.text = $"{winRateTmp:F1}%";
+            }
+
+            highScoreGivenText.text = $"{PlayerPrefs.GetInt("given100")}";
+            highScoreReceivedText.text = $"{PlayerPrefs.GetInt("received100")}";
+            highScoreDiffText.text = $"{PlayerPrefs.GetFloat("diff100")}";
+
+        }
+        else if (highScoreState == 100)
+        {
+            highScoreState = 0;
+            highScoreArea.SetActive(false);
+        }
+
+    }
 
     public void Split()
     {
@@ -1468,6 +1676,10 @@ public class BlackJack : MonoBehaviour
 
     }
 
+    public void ButtonTest()
+    {
+        Debug.Log($"{PlayerPrefs.GetInt("diff25")}");
+    }
 
 
 }

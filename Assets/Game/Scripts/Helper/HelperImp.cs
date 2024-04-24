@@ -85,13 +85,8 @@ public class HelperImp : MonoBehaviour
 
             if (dealerNum > 10) dealerNum = 10;
 
-
-
             if (isSplitted)
             {
-
-
-
 
                 if (bj.phase == 1)
                 {
@@ -455,6 +450,8 @@ public class HelperImp : MonoBehaviour
 
                     if (playerCard1 == playerCard2)
                     {
+                        if(playerCard1 > 10) playerCard1 = 10;
+
                         switch (playerCard1)
                         {
                             case 1:
